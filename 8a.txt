@@ -1,0 +1,32 @@
+# 1. Install steghide
+sudo apt install steghide
+
+# 2. Create secret message
+echo "This is a hidden message inside the image." > secret.txt
+cat secret.txt
+
+# 3. Embed secret into cover image (creates stego.jpg)
+steghide embed -cf cover.jpg -ef secret.txt -sf stego.jpg
+# -cf = cover file  -ef = embed file  -sf = stego (output) file
+# Enter and confirm a passphrase when prompted
+
+# 4. Verify data is embedded
+steghide info stego.jpg
+# Shows: embedded file name, encryption algo, data size
+
+# 5. Extract the hidden message
+steghide extract -sf stego.jpg
+# Enter same passphrase → secret.txt is extracted
+
+# 6a. Verify integrity with diff
+diff secret.txt secret.txt
+# No output = files are identical
+
+# 6b. Verify integrity with md5sum
+md5sum secret.txt           # note hash
+md5sum secret.txt           # same hash before and after = unchanged
+
+# 7. Compare original vs stego image (hashes WILL differ — LSBs changed)
+md5sum cover.jpg            # hash A
+md5sum stego.jpg            # hash B (different — LSBs modified)
+# Different file hash but visually identical = LSB steganography works
