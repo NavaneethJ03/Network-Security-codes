@@ -1,0 +1,35 @@
+import sqlite3
+
+def get_user_data(username):
+    conn = sqlite3.connect('example.db')
+    cursor = conn.cursor()
+
+    # VULNERABLE: user input directly concatenated into SQL string
+    query = "SELECT * FROM users WHERE username = '" + username + "';"
+    print(f"Executing Query: {query}")
+    cursor.execute(query)
+
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+# ATTACK: input = "' OR '1'='1"
+# Query becomes: SELECT * FROM users WHERE username = '' OR '1'='1';
+# '1'='1' is always TRUE → returns ALL rows in the table!
+✅ Secure Code (Parameterized Query)
+import sqlite3
+
+def get_user_data_secure(username):
+    conn = sqlite3.connect('example.db')
+    cursor = conn.cursor()
+
+    # SECURE: ? is a placeholder. User input passed separately as tuple.
+    query = "SELECT * FROM users WHERE username = ?;"
+    cursor.execute(query, (username,))  # DB driver handles escaping
+
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+# If user inputs "' OR '1'='1", the DB literally searches for a user
+# named "' OR '1'='1" — it's treated as DATA, not as code.
