@@ -1,0 +1,32 @@
+# 1-2. Update and install SSH
+sudo apt update && sudo apt upgrade -y
+sudo apt install openssh-server -y
+sudo systemctl start ssh && sudo systemctl enable ssh
+
+# 3. Generate key pair on CLIENT (4096-bit RSA)
+ssh-keygen -t rsa -b 4096
+
+# 4. Copy public key to server
+ssh-copy-id username@server_ip
+
+# 5. Disable password login on server
+sudo nano /etc/ssh/sshd_config
+# Change/add: PasswordAuthentication no | PubkeyAuthentication yes | PermitRootLogin no
+sudo systemctl restart ssh
+
+# 6. Test login (should work without password)
+ssh username@server_ip
+
+# 7-8. Install and configure Fail2Ban
+sudo apt install fail2ban -y
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo nano /etc/fail2ban/jail.local
+# Add at bottom: [DEFAULT] bantime=600 findtime=600 maxretry=3 backend=systemd
+#               [sshd] enabled=true port=ssh logpath=%(sshd_log)s
+
+# 9. Start Fail2Ban
+sudo systemctl start fail2ban && sudo systemctl enable fail2ban
+
+# 10. Check status
+sudo systemctl status fail2ban
+sudo fail2ban-client status
