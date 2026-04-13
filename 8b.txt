@@ -1,0 +1,27 @@
+# 1. Create sample file
+echo "This is a sample file for hashing experiment" > file.txt
+cat file.txt
+
+# 2. Compute SHA-256 hash
+sha256sum file.txt
+# Output: c0535e4be2b79ffd... file.txt
+
+# Save hash to file
+sha256sum file.txt > hash.txt
+
+# 3. Generate HMAC using OpenSSL
+openssl dgst -sha256 -hmac "secretkey" file.txt
+# Output: HMAC-SHA256(file.txt)= 8f6b1c5d...
+# -sha256 = hashing algo  -hmac = the secret key
+
+# 4. Verify file integrity (file unchanged)
+sha256sum -c hash.txt
+# Output: file.txt: OK
+
+# 5. Tamper with the file
+echo "File modified!" >> file.txt
+# >> appends (doesn't overwrite)
+
+# 6. Verify again (should fail now)
+sha256sum -c hash.txt
+# Output: file.txt: FAILED — hash mismatch detected
