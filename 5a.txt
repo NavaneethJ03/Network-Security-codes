@@ -1,0 +1,26 @@
+# Check if GPG is installed
+gpg --version
+
+# Install if needed
+sudo apt install gnupg
+
+# Generate a key pair (follow prompts: name, email, passphrase)
+gpg --gen-key
+
+# List generated keys to confirm
+gpg --list-keys
+
+# Create a message file
+nano message.txt
+
+# Encrypt for recipient "Test User" (uses their public key)
+gpg -e -r "Test User" message.txt
+# Creates: message.txt.gpg (binary encrypted file)
+
+# Verify the encrypted file exists (shows binary garbage)
+ls -l
+cat message.txt.gpg
+
+# Decrypt (enter passphrase when prompted)
+gpg -d message.txt.gpg
+# Shows original plaintext
