@@ -1,0 +1,16 @@
+1
+Generate client cert
+cd ~/openvpn-ca → ./easyrsa gen-req client1 nopass → ./easyrsa sign-req client client1 → type yes
+2
+Copy 4 key files to home folder
+cp pki/issued/client1.crt pki/private/client1.key pki/ca.crt ta.key ~/
+These 4 files go inside the .ovpn config
+3
+Create client1.ovpn
+nano ~/client1.ovpn — Paste template with remote YOUR_SERVER_IP 1194 and inline paste contents of ca.crt, client1.crt, client1.key, ta.key inside XML-style tags
+4
+Transfer to Windows
+Use SCP/USB/file share → copy client1.ovpn to C:\Program Files\OpenVPN\config\
+5
+Connect via OpenVPN GUI
+Run OpenVPN GUI as Administrator → right-click tray icon → Connect → verify via ipconfig in CMD (should see 10.8.0.x)
